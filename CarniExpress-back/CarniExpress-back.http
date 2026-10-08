@@ -1,0 +1,6 @@
+@CarniExpress_back_HostAddress = http://localhost:5134
+
+GET {{CarniExpress_back_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
