@@ -55,12 +55,12 @@ namespace CarniExpress_back.Controllers
                     "Falta configurar Jwt:Key");
 
             var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
-                new Claim(ClaimTypes.Email, usuario.Correo),
-                new Claim(ClaimTypes.Role, usuario.Rol)
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+ {
+    new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+    new Claim(ClaimTypes.Email, usuario.Correo),
+    new Claim(ClaimTypes.Role, usuario.Rol),
+    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+};
 
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(secreto));
