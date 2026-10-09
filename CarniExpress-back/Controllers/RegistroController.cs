@@ -59,6 +59,7 @@ namespace CarniExpress_back.Controllers
                 new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
                 new Claim(ClaimTypes.Email, usuario.Correo),
                 new Claim(ClaimTypes.Role, usuario.Rol)
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var key = new SymmetricSecurityKey(
