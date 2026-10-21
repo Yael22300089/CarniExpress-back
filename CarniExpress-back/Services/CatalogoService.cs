@@ -114,6 +114,22 @@ namespace CarniExpress_back.Services
                 .ToList();
         }
 
+
+        public List<ProductoCatalogoDto> FiltrarPorCategoria(
+            string categoria)
+        {
+            // Obtener solamente productos activos
+            var productos = ObtenerProductosActivos();
+
+            // Filtrar por la categoría seleccionada
+            return productos
+                .Where(p => p.Categoria.Equals(
+                    categoria,
+                    StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+
         private static string NormalizarTexto(string texto)
         {
             string normalizado = texto.Normalize(
