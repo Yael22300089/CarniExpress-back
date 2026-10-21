@@ -175,5 +175,43 @@ namespace CarniExpress_back.Controllers
         }
 
 
+        // =============================================
+        // HU-008: CONSULTAR DETALLE DEL PRODUCTO
+        // GET: api/catalogo/1
+        // =============================================
+
+        [HttpGet("{id:int}")]
+        public IActionResult ObtenerDetalleProducto(int id)
+        {
+            // Validar identificador
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "El identificador debe ser mayor a cero"
+                });
+            }
+
+            // Obtener detalle actualizado
+            var producto = _catalogoService.ObtenerDetallePorId(id);
+
+            // Producto inexistente o desactivado
+            if (producto == null)
+            {
+                return NotFound(new
+                {
+                    mensaje = "Producto no encontrado o no disponible"
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = "Detalle consultado correctamente",
+                producto
+            });
+        }
+
+
+
     }
 }

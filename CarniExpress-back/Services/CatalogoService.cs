@@ -7,66 +7,30 @@ namespace CarniExpress_back.Services
     {
         private readonly List<Producto> _productos = new()
         {
-            new Producto
-            {
-                Id = 1,
-                Nombre = "Bistec de res",
-                Categoria = "Res",
-                PrecioPorKg = 210.00m,
-                ImagenUrl = "/imagenes/bistec.jpg",
-                ExistenciaKg = 25m,
-                Activo = true
-            },
-            new Producto
-            {
-                Id = 2,
-                Nombre = "Costilla de res",
-                Categoria = "Res",
-                PrecioPorKg = 180.00m,
-                ImagenUrl = "/imagenes/costilla.jpg",
-                ExistenciaKg = 0m,
-                Activo = true
-            },
-            new Producto
-            {
-                Id = 3,
-                Nombre = "Pechuga de pollo",
-                Categoria = "Pollo",
-                PrecioPorKg = 120.00m,
-                ImagenUrl = "/imagenes/pechuga.jpg",
-                ExistenciaKg = 18m,
-                Activo = true
-            },
-            new Producto
-            {
-                Id = 4,
-                Nombre = "Chuleta de cerdo",
-                Categoria = "Cerdo",
-                PrecioPorKg = 130.00m,
-                ImagenUrl = "/imagenes/chuleta.jpg",
-                ExistenciaKg = 12m,
-                Activo = true
-            },
-            new Producto
-            {
-                Id = 5,
-                Nombre = "Chorizo",
-                Categoria = "Embutidos",
-                PrecioPorKg = 140.00m,
-                ImagenUrl = "/imagenes/chorizo.jpg",
-                ExistenciaKg = 8m,
-                Activo = true
-            },
-            new Producto
-            {
-                Id = 6,
-                Nombre = "Producto desactivado",
-                Categoria = "Res",
-                PrecioPorKg = 100.00m,
-                ImagenUrl = "",
-                ExistenciaKg = 5m,
-                Activo = false
-            }
+
+new Producto
+{
+    Id = 1,
+    Nombre = "Bistec de res",
+    Descripcion = "Corte de carne de res ideal para asar o preparar a la plancha. Se vende por kilogramo.",
+    Categoria = "Res",
+    PrecioPorKg = 210.00m,
+    ImagenUrl = "/imagenes/bistec.jpg",
+    ExistenciaKg = 25m,
+    Activo = true
+},
+new Producto
+{
+    Id = 2,
+    Nombre = "Costilla de res",
+    Descripcion = "Costilla de res para preparar al horno, a la parrilla o en guisados.",
+    Categoria = "Res",
+    PrecioPorKg = 180.00m,
+    ImagenUrl = "/imagenes/costilla.jpg",
+    ExistenciaKg = 0m,
+    Activo = true
+},
+
         };
 
         public List<ProductoCatalogoDto> ObtenerProductosActivos()
@@ -128,6 +92,40 @@ namespace CarniExpress_back.Services
                     StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
+
+
+        public ProductoDetalleDto? ObtenerDetallePorId(int id)
+        {
+            // Consultar el producto activo
+            var producto = _productos.FirstOrDefault(p =>
+                p.Id == id && p.Activo);
+
+            if (producto == null)
+            {
+                return null;
+            }
+
+            // Comprobar disponibilidad
+            bool disponible = producto.ExistenciaKg > 0;
+
+            // Devolver información actual del producto
+            return new ProductoDetalleDto
+            {
+                Id = producto.Id,
+                Nombre = producto.Nombre,
+                Descripcion = producto.Descripcion,
+                Categoria = producto.Categoria,
+                PrecioPorKg = producto.PrecioPorKg,
+                ImagenUrl = producto.ImagenUrl,
+                ExistenciaKg = producto.ExistenciaKg,
+                Disponible = disponible,
+                PuedeAgregar = disponible,
+                Estado = disponible
+                    ? "Disponible"
+                    : "No disponible"
+            };
+        }
+
 
 
         private static string NormalizarTexto(string texto)
