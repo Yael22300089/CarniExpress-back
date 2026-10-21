@@ -93,5 +93,50 @@ namespace CarniExpress_back.Services
             return ObtenerProductosActivos()
                 .FirstOrDefault(p => p.Id == id);
         }
+
+
+        public List<ProductoCatalogoDto> BuscarPorNombre(string? texto)
+        {
+            var productos = ObtenerProductosActivos();
+
+            if (string.IsNullOrWhiteSpace(texto))
+            {
+                return productos;
+            }
+
+            string busqueda = NormalizarTexto(texto.Trim());
+
+            return productos
+                .Where(p =>
+                    NormalizarTexto(p.Nombre).Contains(
+                        busqueda,
+                        StringComparison.Ordinal))
+                .ToList();
+        }
+
+        private static string NormalizarTexto(string texto)
+        {
+            string normalizado = texto.Normalize(
+                System.Text.NormalizationForm.FormD);
+
+            var resultado = new System.Text.StringBuilder();
+
+            foreach (char caracter in normalizado)
+            {
+                var categoria =
+                    System.Globalization.CharUnicodeInfo.GetUnicodeCategory(
+                        caracter);
+
+                if (categoria !=
+                    System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    resultado.Append(char.ToLowerInvariant(caracter));
+                }
+            }
+
+            return resultado.ToString()
+                .Normalize(System.Text.NormalizationForm.FormC);
+        }
+
     }
 }

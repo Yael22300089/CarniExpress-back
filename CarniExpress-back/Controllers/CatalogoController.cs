@@ -81,5 +81,44 @@ namespace CarniExpress_back.Controllers
 
             return Ok(producto);
         }
+
+
+        // =====================================
+        // HU-006: BUSCAR PRODUCTOS POR NOMBRE
+        // GET: api/catalogo/buscar?nombre=bistec
+        // =====================================
+
+        [HttpGet("buscar")]
+        public IActionResult BuscarProductos(
+            [FromQuery] string? nombre)
+        {
+            if (nombre != null && nombre.Length > 100)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "La búsqueda no puede superar 100 caracteres"
+                });
+            }
+
+            var productos = _catalogoService.BuscarPorNombre(nombre);
+
+            if (productos.Count == 0)
+            {
+                return Ok(new
+                {
+                    mensaje = "Sin resultados para tu búsqueda",
+                    totalProductos = 0,
+                    productos
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = "Búsqueda realizada correctamente",
+                totalProductos = productos.Count,
+                productos
+            });
+        }
+
     }
 }
