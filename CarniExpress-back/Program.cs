@@ -30,6 +30,10 @@ builder.Services.AddSingleton<TokenRevocationService>();
 // HU-005: Servicio del catálogo de productos
 builder.Services.AddSingleton<CatalogoService>();
 
+//HU-008: Servicio del carrito compras
+builder.Services.AddSingleton<CarritoService>();
+
+
 // =====================================
 // CONFIGURACIÓN JWT
 // =====================================
