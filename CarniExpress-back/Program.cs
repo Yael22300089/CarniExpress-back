@@ -57,6 +57,9 @@ builder.Services.AddSingleton<UsuarioService>();
 // Servicio para revocar tokens
 builder.Services.AddSingleton<TokenRevocationService>();
 
+// HU-005: Servicio del catálogo de productos
+builder.Services.AddSingleton<CatalogoService>();
+
 // =====================================
 // CONFIGURACIÓN JWT
 // =====================================
