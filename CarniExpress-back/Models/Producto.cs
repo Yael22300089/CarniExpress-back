@@ -16,5 +16,7 @@ namespace CarniExpress_back.Models
         public decimal ExistenciaKg { get; set; }
 
         public bool Activo { get; set; }
+
+        public string Descripcion { get; set; } = "";
     }
 }
