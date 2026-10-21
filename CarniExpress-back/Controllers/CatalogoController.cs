@@ -120,5 +120,60 @@ namespace CarniExpress_back.Controllers
             });
         }
 
+
+
+        // =========================================
+        // HU-007: FILTRAR POR CATEGORÍA
+        // GET: api/catalogo/categoria/Res
+        // =========================================
+
+        [HttpGet("categoria/{categoria}")]
+        public IActionResult FiltrarPorCategoria(string categoria)
+        {
+            string[] categoriasPermitidas =
+            {
+        "Res",
+        "Pollo",
+        "Cerdo",
+        "Embutidos"
+    };
+
+            // Validar categoría
+            if (!categoriasPermitidas.Contains(
+                categoria,
+                StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest(new
+                {
+                    mensaje = "Categoría no válida",
+                    categoriasPermitidas
+                });
+            }
+
+            // Consultar productos activos
+            var productos =
+                _catalogoService.FiltrarPorCategoria(categoria);
+
+            if (productos.Count == 0)
+            {
+                return Ok(new
+                {
+                    mensaje = "No hay productos en esta categoría",
+                    categoria,
+                    totalProductos = 0,
+                    productos
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = "Productos filtrados correctamente",
+                categoria,
+                totalProductos = productos.Count,
+                productos
+            });
+        }
+
+
     }
 }
