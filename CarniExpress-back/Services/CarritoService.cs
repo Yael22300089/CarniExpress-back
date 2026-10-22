@@ -226,5 +226,59 @@ namespace CarniExpress_back.Services
         }
 
 
+
+        // ==========================================
+        // HU-011: ELIMINAR PRODUCTO DEL CARRITO
+        // ==========================================
+
+        public (bool Exito, string Mensaje) EliminarProducto(
+            string sesionId, int productoId)
+        {
+            lock (_lock)
+            {
+                // Validar la sesión
+                if (string.IsNullOrWhiteSpace(sesionId))
+                {
+                    return (false, "Sesión no válida");
+                }
+
+                // Validar identificador
+                if (productoId <= 0)
+                {
+                    return (false, "Producto no válido");
+                }
+
+                // Buscar el carrito de la sesión
+                if (!_carritos.TryGetValue(sesionId, out var items))
+                {
+                    return (false, "Carrito no encontrado");
+                }
+
+                // Buscar el producto seleccionado
+                var item = items.FirstOrDefault(
+                    p => p.ProductoId == productoId);
+
+                if (item == null)
+                {
+                    return (false,
+                        "Producto no encontrado en el carrito");
+                }
+
+                // Eliminar únicamente el producto solicitado
+                items.Remove(item);
+
+                // Si ya no quedan productos,
+                // eliminar el carrito vacío de memoria
+                if (items.Count == 0)
+                {
+                    _carritos.Remove(sesionId);
+                }
+
+                return (true, "Producto eliminado correctamente");
+            }
+        }
+
+
+
     }
 }
