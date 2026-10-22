@@ -279,6 +279,69 @@ namespace CarniExpress_back.Services
         }
 
 
+        // ==========================================
+        // HU-012: DESGLOSE Y TOTAL DEL CARRITO
+        // ==========================================
+
+        public DesgloseCarritoResponse ObtenerDesglose(
+            string sesionId)
+        {
+            lock (_lock)
+            {
+                var respuesta = new DesgloseCarritoResponse();
+
+                if (string.IsNullOrWhiteSpace(sesionId))
+                {
+                    respuesta.CarritoVacio = true;
+                    respuesta.Mensaje = "Sesión no válida";
+                    return respuesta;
+                }
+
+                if (!_carritos.TryGetValue(sesionId, out var items)
+                    || items.Count == 0)
+                {
+                    respuesta.CarritoVacio = true;
+                    respuesta.Mensaje = "Tu carrito está vacío";
+                    return respuesta;
+                }
+
+                respuesta.Productos = items.Select(item =>
+                {
+                    // Calcular subtotal monetario
+                    decimal subtotal = decimal.Round(
+                        item.CantidadKg * item.PrecioPorKg,
+                        2,
+                        MidpointRounding.AwayFromZero);
+
+                    return new DesgloseProductoDto
+                    {
+                        ProductoId = item.ProductoId,
+                        Nombre = item.Nombre,
+                        CantidadKg = item.CantidadKg,
+                        PrecioPorKg = item.PrecioPorKg,
+                        Subtotal = subtotal
+                    };
+                }).ToList();
+
+                respuesta.TotalProductos = respuesta.Productos.Count;
+
+                respuesta.TotalKg = respuesta.Productos.Sum(
+                    p => p.CantidadKg);
+
+                // El total suma los mismos subtotales
+                // que recibe el frontend
+                respuesta.Total = respuesta.Productos.Sum(
+                    p => p.Subtotal);
+
+                respuesta.CarritoVacio = false;
+                respuesta.Mensaje = "Desglose obtenido correctamente";
+
+                return respuesta;
+            }
+        }
+
+
+
 
     }
 }
