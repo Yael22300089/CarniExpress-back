@@ -182,5 +182,67 @@ namespace CarniExpress_back.Controllers
             });
         }
 
+
+        // ==========================================
+        // HU-011: ELIMINAR PRODUCTO DEL CARRITO
+        // DELETE: api/carrito/productos/1?confirmar=true
+        // ==========================================
+
+        [HttpDelete("productos/{id:int}")]
+        public IActionResult EliminarProducto(
+            int id,
+            [FromQuery] bool confirmar = false)
+        {
+            if (id <= 0)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "Producto no válido"
+                });
+            }
+
+            // Exigir confirmación explícita
+            if (!confirmar)
+            {
+                return BadRequest(new
+                {
+                    mensaje = "Debes confirmar la eliminación"
+                });
+            }
+
+            // Identificar al cliente autenticado
+            var sesionId = ObtenerSesionId();
+
+            if (string.IsNullOrWhiteSpace(sesionId))
+            {
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+            }
+
+            // Eliminar producto
+            var resultado = _carrito.EliminarProducto(
+                sesionId, id);
+
+            if (!resultado.Exito)
+            {
+                return BadRequest(new
+                {
+                    mensaje = resultado.Mensaje
+                });
+            }
+
+            // Obtener carrito actualizado
+            var carrito = _carrito.ObtenerCarrito(sesionId);
+
+            return Ok(new
+            {
+                mensaje = resultado.Mensaje,
+                carrito
+            });
+        }
+
+
     }
 }
