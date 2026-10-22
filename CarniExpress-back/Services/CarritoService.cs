@@ -138,5 +138,93 @@ namespace CarniExpress_back.Services
                     : 0;
             }
         }
+
+        //HU-010 Aumentar 0.5 en el carrito 
+        public (bool Exito, string Mensaje) AumentarCantidad(
+            string sesionId, int productoId)
+        {
+            lock (_lock)
+            {
+                if (string.IsNullOrWhiteSpace(sesionId))
+                    return (false, "Sesión no válida");
+
+                if (!_carritos.TryGetValue(sesionId, out var items))
+                    return (false, "Carrito no encontrado");
+
+                var item = items.FirstOrDefault(
+                    p => p.ProductoId == productoId);
+
+                if (item == null)
+                    return (false, "Producto no encontrado en el carrito");
+
+                var producto = _catalogo.ObtenerDetallePorId(productoId);
+
+                if (producto == null || !producto.Disponible)
+                    return (false, "Producto no disponible");
+
+                decimal nuevaCantidad = item.CantidadKg + 0.5m;
+
+                if (nuevaCantidad > producto.ExistenciaKg)
+                {
+                    return (false,
+                        "No hay más existencia disponible");
+                }
+
+                item.CantidadKg = nuevaCantidad;
+                item.PrecioPorKg = producto.PrecioPorKg;
+                item.Nombre = producto.Nombre;
+
+                return (true, "Cantidad aumentada correctamente");
+            }
+        }
+
+
+        // HU-010 Disminuir 0.5 en el carrito 
+        public (bool Exito, string Mensaje) DisminuirCantidad(
+            string sesionId, int productoId)
+        {
+            lock (_lock)
+            {
+                if (string.IsNullOrWhiteSpace(sesionId))
+                    return (false, "Sesión no válida");
+
+                if (!_carritos.TryGetValue(sesionId, out var items))
+                    return (false, "Carrito no encontrado");
+
+                var item = items.FirstOrDefault(
+                    p => p.ProductoId == productoId);
+
+                if (item == null)
+                    return (false, "Producto no encontrado en el carrito");
+
+                decimal nuevaCantidad = item.CantidadKg - 0.5m;
+
+                // Eliminar automáticamente al bajar de 0.5 kg
+                if (nuevaCantidad < 0.5m)
+                {
+                    items.Remove(item);
+
+                    if (items.Count == 0)
+                        _carritos.Remove(sesionId);
+
+                    return (true, "Producto eliminado del carrito");
+                }
+
+                item.CantidadKg = nuevaCantidad;
+
+                // Actualizar el precio si el producto sigue activo
+                var producto = _catalogo.ObtenerDetallePorId(productoId);
+
+                if (producto != null)
+                {
+                    item.PrecioPorKg = producto.PrecioPorKg;
+                    item.Nombre = producto.Nombre;
+                }
+
+                return (true, "Cantidad disminuida correctamente");
+            }
+        }
+
+
     }
 }

@@ -103,5 +103,84 @@ namespace CarniExpress_back.Controllers
                     _carrito.ObtenerIndicador(sesionId)
             });
         }
+
+
+
+
+        // =====================================
+        // HU-010: AUMENTAR CANTIDAD
+        // PATCH: api/carrito/productos/1/aumentar
+        // =====================================
+
+        [HttpPatch("productos/{id:int}/aumentar")]
+        public IActionResult AumentarCantidad(int id)
+        {
+            if (id <= 0)
+                return BadRequest(new
+                {
+                    mensaje = "Producto no válido"
+                });
+
+            var sesionId = ObtenerSesionId();
+
+            if (sesionId == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+
+            var resultado = _carrito.AumentarCantidad(sesionId, id);
+
+            if (!resultado.Exito)
+                return BadRequest(new
+                {
+                    mensaje = resultado.Mensaje
+                });
+
+            return Ok(new
+            {
+                mensaje = resultado.Mensaje,
+                carrito = _carrito.ObtenerCarrito(sesionId)
+            });
+        }
+
+
+        // =====================================
+        // HU-010: DISMINUIR CANTIDAD
+        // PATCH: api/carrito/productos/1/disminuir
+        // =====================================
+
+        [HttpPatch("productos/{id:int}/disminuir")]
+        public IActionResult DisminuirCantidad(int id)
+        {
+            if (id <= 0)
+                return BadRequest(new
+                {
+                    mensaje = "Producto no válido"
+                });
+
+            var sesionId = ObtenerSesionId();
+
+            if (sesionId == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+
+            var resultado = _carrito.DisminuirCantidad(sesionId, id);
+
+            if (!resultado.Exito)
+                return BadRequest(new
+                {
+                    mensaje = resultado.Mensaje
+                });
+
+            return Ok(new
+            {
+                mensaje = resultado.Mensaje,
+                carrito = _carrito.ObtenerCarrito(sesionId)
+            });
+        }
+
     }
 }
