@@ -18,20 +18,26 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 // =====================================
 // SERVICIOS EN MEMORIA
 // =====================================
 
+// HU-001 y HU-002: Usuarios
 builder.Services.AddSingleton<UsuarioService>();
 
-// Servicio para revocar tokens
+// HU-003: Revocación de tokens
 builder.Services.AddSingleton<TokenRevocationService>();
 
-// HU-005: Servicio del catálogo de productos
+// HU-005 a HU-008: Catálogo de productos
 builder.Services.AddSingleton<CatalogoService>();
+
 
 //HU-008: Servicio del carrito compras
 builder.Services.AddSingleton<CarritoService>();
+
+
+
 
 
 // =====================================
@@ -70,10 +76,7 @@ builder.Services
                 ClockSkew = TimeSpan.Zero
             };
 
-        // =====================================
-        // VALIDAR TOKENS REVOCADOS
-        // =====================================
-
+        // Validar tokens revocados
         options.Events = new JwtBearerEvents
         {
             OnTokenValidated = context =>
@@ -89,6 +92,7 @@ builder.Services
                 {
                     context.Fail(
                         "El token no contiene un identificador válido");
+
                     return Task.CompletedTask;
                 }
 
@@ -132,7 +136,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 // =====================================

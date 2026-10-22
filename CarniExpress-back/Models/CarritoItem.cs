@@ -1,11 +1,11 @@
-﻿v
+
 namespace CarniExpress_back.Models
 {
     public class CarritoItem
     {
         public int ProductoId { get; set; }
 
-        public string Nombre { get; set; } = "";
+        public string Nombre { get; set; } = string.Empty;
 
         public decimal CantidadKg { get; set; }
 
