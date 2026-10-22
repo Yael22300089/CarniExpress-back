@@ -1,0 +1,107 @@
+﻿
+using CarniExpress_back.Models;
+using CarniExpress_back.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+namespace CarniExpress_back.Controllers
+{
+    [ApiController]
+    [Route("api/carrito")]
+    [Authorize(Roles = "CLIENTE")]
+    public class CarritoController : ControllerBase
+    {
+        private readonly CarritoService _carrito;
+
+        public CarritoController(CarritoService carrito)
+        {
+            _carrito = carrito;
+        }
+
+        // Identificar sesión desde el JWT
+        private string? ObtenerSesionId()
+        {
+            var usuarioId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            var tokenId = User.FindFirstValue(
+                JwtRegisteredClaimNames.Jti)
+                ?? User.FindFirstValue("jti");
+
+            if (string.IsNullOrWhiteSpace(usuarioId) ||
+                string.IsNullOrWhiteSpace(tokenId))
+            {
+                return null;
+            }
+
+            return $"{usuarioId}:{tokenId}";
+        }
+
+        // POST: api/carrito/productos
+        [HttpPost("productos")]
+        public IActionResult AgregarProducto(
+            [FromBody] AgregarCarritoRequest request)
+        {
+            var sesionId = ObtenerSesionId();
+
+            if (sesionId == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+
+            var resultado = _carrito.Agregar(
+                sesionId, request);
+
+            if (!resultado.Exito)
+            {
+                return BadRequest(new
+                {
+                    mensaje = resultado.Mensaje
+                });
+            }
+
+            return Ok(new
+            {
+                mensaje = resultado.Mensaje,
+                carrito = _carrito.ObtenerCarrito(sesionId)
+            });
+        }
+
+        // GET: api/carrito
+        [HttpGet]
+        public IActionResult ConsultarCarrito()
+        {
+            var sesionId = ObtenerSesionId();
+
+            if (sesionId == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+
+            return Ok(_carrito.ObtenerCarrito(sesionId));
+        }
+
+        // GET: api/carrito/indicador
+        [HttpGet("indicador")]
+        public IActionResult ConsultarIndicador()
+        {
+            var sesionId = ObtenerSesionId();
+
+            if (sesionId == null)
+                return Unauthorized(new
+                {
+                    mensaje = "Sesión no válida"
+                });
+
+            return Ok(new
+            {
+                totalProductos =
+                    _carrito.ObtenerIndicador(sesionId)
+            });
+        }
+    }
+}
