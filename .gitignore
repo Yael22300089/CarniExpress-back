@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 .vs/
 bin/
 obj/
 *.user
 *.suo
+=======
+bin/
+obj/
+appsettings.Development.json
+.env
+>>>>>>> 352c8e8 (actualizacion de todo el back)
